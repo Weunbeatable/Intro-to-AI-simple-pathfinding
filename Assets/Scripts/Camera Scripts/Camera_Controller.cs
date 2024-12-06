@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 public class Camera_Controller : MonoBehaviour
 {
     private const float MIN_FOLLOW_Y_OFFSET = 2f;
-    private const float MAX_FOLLOW_Y_OFFSET = 15f;
+    private const float MAX_FOLLOW_Y_OFFSET = 35f;
 
     public static Camera_Controller Instance { get; private set; }
 

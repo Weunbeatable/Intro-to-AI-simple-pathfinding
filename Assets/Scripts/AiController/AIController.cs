@@ -51,6 +51,7 @@ namespace IntroAI.Control
         {
            
             player = GameObject.FindWithTag("Hero"); // You can choose to create an alternate tag or method of player detection but this will be used for simplicity. 
+            Debug.Log(player.name);
             myRigidbody = GetComponent<Rigidbody>();
            // health = GetComponent<Health>(); You can later create yoru own health class with your own defined parameters, for the sake of keeping it simple 
            // we would simply check here if the character is alive or not to run any of this code. It will be commented out for the sake of the example. 
@@ -139,8 +140,10 @@ namespace IntroAI.Control
             if (patrolPath != null)
             {
                 if (atWaypoint())
-                {                  
-                    timeSinceArrivedAtWaypoint = 0; // reset when arrived at next waypoint                
+                {
+                    Debug.Log("are you there " +  atWaypoint());
+                    GetComponent<Animator>().SetTrigger("idle");
+                    timeSinceArrivedAtWaypoint = 0; // reset when arrived at next waypoint                   
                     CycleWaypoint();
                 }
                 if (timeSinceArrivedAtWaypoint > waypointDwellTime)
@@ -149,6 +152,10 @@ namespace IntroAI.Control
                     GetComponent<Animator>().SetTrigger("walk");
                     //Debug.Log("The next pos is " + nextPosition);
                     //if (currentWaypointIndex == 0 || currentWaypointIndex)
+                }
+                else
+                {
+                    GetComponent<Animator>().SetTrigger("idle");
                 }
 
             }
@@ -167,6 +174,7 @@ namespace IntroAI.Control
             float regularSpeed = patrolSpeed * Time.deltaTime;
            myRigidbody.transform.position = Vector3.MoveTowards(myRigidbody.transform.position, nextPosition, regularSpeed);
             DirectionToFace();
+           // GetComponent<Animator>().SetTrigger("walk");
         }
         
 
@@ -183,8 +191,7 @@ namespace IntroAI.Control
 
         private bool atWaypoint()
         {
-            float distanceToWaypoint = Vector3.Distance(transform.position, GetCurrentWaypoint());
-            GetComponent<Animator>().SetTrigger("idle");
+            float distanceToWaypoint = Vector3.Distance(myRigidbody.transform.position, GetCurrentWaypoint());
             // Debug.Log("waypointdistance is" + distanceToWaypoint);
             return distanceToWaypoint < waypointTolerance;
         }
@@ -193,7 +200,7 @@ namespace IntroAI.Control
         {
             if (player != null)
             {
-                float distanceToPlayer = Vector2.Distance(player.transform.position, transform.position); // vector2.square Magnitude is faster but for such a arbitrarily small task it doesn't really matter in this example. 
+                float distanceToPlayer = Vector3.Distance(player.transform.position, transform.position); // vector2.square Magnitude is faster but for such a arbitrarily small task it doesn't really matter in this example. 
 
                 return distanceToPlayer < chaseDistance;
             }
@@ -203,7 +210,7 @@ namespace IntroAI.Control
         private bool facingPlayer()
         {
             float dot = Vector3.Dot(transform.right, (player.transform.position - transform.position).normalized);
-            float fov = 0.7f; // Field of View of AI, may make it adjustable for enemy types at some point.
+            float fov = 1f; // Field of View of AI, may make it adjustable for enemy types at some point.
             return dot > fov;
         }
 
@@ -217,14 +224,15 @@ namespace IntroAI.Control
             }
             else
             {
-                GetComponent<Animator>().SetTrigger("walk");
+                
                 // We don't meet the requirements for combat which were set to us when we asked the question CanAttack()
                 // in this case in order to meet the requirement we need to get a bit closer. 
                 float regularSpeed = engageDistace * Time.deltaTime;
                 Vector3 playersPos = player.transform.position;
                 playersPos.y = 0f;
                 myRigidbody.transform.position = Vector3.MoveTowards(myRigidbody.transform.position, playersPos, regularSpeed);
-                
+                GetComponent<Animator>().SetTrigger("walk");
+
             }
         }
         public void AttackBehavior()

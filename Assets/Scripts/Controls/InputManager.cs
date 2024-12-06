@@ -9,7 +9,12 @@ public class InputManager : MonoBehaviour
 {
     public static InputManager Instance { get; private set; }
     private PlayerInputActions playerActions;
+    public LayerMask layersToHit; 
 
+
+    // for mouse interaction. 
+    public Vector3 screenPosition;
+    public Vector3 worldPosition;
     private void Awake()
     {
         // error check for more than one instance, hence singleton, we'll delete the extra
@@ -100,4 +105,26 @@ public class InputManager : MonoBehaviour
 
     }
 
+    public Vector3 GetMousePosToWorldPos()
+    {
+        screenPosition = Input.mousePosition; // read input from our mouse
+        screenPosition.z = Camera.main.nearClipPlane; // We need a depth value so we can have proper interaction
+        worldPosition = Camera.main.transform.position; // grab our cameras position 
+
+        //transform.position = worldPosition; // assign  mouse position
+        return worldPosition;
+    }
+
+    public Vector3 GetPositionUsingRay()
+    {
+        screenPosition = Input.mousePosition;
+        Ray ray = Camera.main.ScreenPointToRay(screenPosition); // draw out a ray
+        // check for collision with an object. 
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, layersToHit))
+        {
+            worldPosition = hitInfo.point; // where in the world the hit occured.
+           
+        }
+        return worldPosition;
+    }
 }
